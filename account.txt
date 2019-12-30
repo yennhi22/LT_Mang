@@ -1,3 +1,6 @@
+ducanh3 ducanh3 1 0
+ducanh1 ducanh1 1 0
+ducanh ducanh 1 0
 hoang 123456789 1 7
 lvh 123456 1 0
 lvh2 123456 1 0

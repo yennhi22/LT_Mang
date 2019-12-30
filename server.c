@@ -66,7 +66,22 @@ node_t *find_node(node_t *head, char *username)
 	}
 	return NULL;
 }
+node_t *add_note(node_t *head, char username[], char password[])
+{
+	node_t *new = (node_t*)malloc(sizeof(node_t*));
+	strcpy(new->password,password);
+	strcpy(new->username,username);
+	new->status = 1;
+	new->point = 0;
+	if(head == NULL){
+        head = new; // //Nếu linked list đang trống thì Node temp là head luôn
+    }else{
+        new->next = head; // Trỏ next của temp = head hiện tại
+        head = new; // Đổi head hiện tại = temp(Vì temp bây giờ là head mới mà)
+    }
+    return head;
 
+}
 // save list to text file
 void save_list(node_t *head, char *filename)
 {
@@ -179,102 +194,41 @@ int makeQuestion(int arr[])
 	int easy[4];
 	int medium[4];
 	int hard[2];
-	int i, n=0;
+	int i, n = 0;
 	srand((int)time(0));
 	randomId(easy, 1);
 	randomId(medium, 2);
 	randomId(hard, 3);
 	for (i = 0; i < 4; i++)
 	{
-		arr[n]=easy[i];
+		arr[n] = easy[i];
 		n++;
 	}
 	for (i = 0; i < 4; i++)
 	{
-		arr[n]=medium[i];
+		arr[n] = medium[i];
 		n++;
 	}
 	for (i = 0; i < 2; i++)
 	{
-		arr[n]=hard[i];
+		arr[n] = hard[i];
 		n++;
 	}
 }
-Message makeQuesList()
-{
-	int easy[4];
-	int medium[4];
-	int hard[2];
-	int i, n;
-	Message buff;
-	srand((int)time(0));
-	randomId(easy, 1);
-	randomId(medium, 2);
-	randomId(hard, 3);
-	for (i = 0; i < 4; i++)
-	{
-		n = easyList[easy[i]];
-		strcat(buff.content, questionList[n].content);
-		strcat(buff.content, "\n");
-		strcat(buff.content, questionList[n].choiceA);
-		strcat(buff.content, "\t");
-		strcat(buff.content, questionList[n].choiceB);
-		strcat(buff.content, "\n");
-		strcat(buff.content, questionList[n].choiceC);
-		strcat(buff.content, "\t");
-		strcat(buff.content, questionList[n].choiceD);
-		strcat(buff.content, "\n\n");
-		buff.answer[i] = questionList[n].answer;
-		//printf("%s\n",questionList[n].content);
-	}
-	for (i = 0; i < 4; i++)
-	{
-		n = mediumList[medium[i]];
-		strcat(buff.content, questionList[n].content);
-		strcat(buff.content, "\n");
-		strcat(buff.content, questionList[n].choiceA);
-		strcat(buff.content, "\t");
-		strcat(buff.content, questionList[n].choiceB);
-		strcat(buff.content, "\n");
-		strcat(buff.content, questionList[n].choiceC);
-		strcat(buff.content, "\t");
-		strcat(buff.content, questionList[n].choiceD);
-		strcat(buff.content, "\n\n");
-		buff.answer[i + 4] = questionList[n].answer;
-		//printf("%s\n",questionList[n].content);
-	}
-	for (i = 0; i < 2; i++)
-	{
-		n = hardList[hard[i]];
-		strcat(buff.content, questionList[n].content);
-		strcat(buff.content, "\n");
-		strcat(buff.content, questionList[n].choiceA);
-		strcat(buff.content, "\t");
-		strcat(buff.content, questionList[n].choiceB);
-		strcat(buff.content, "\n");
-		strcat(buff.content, questionList[n].choiceC);
-		strcat(buff.content, "\t");
-		strcat(buff.content, questionList[n].choiceD);
-		strcat(buff.content, "\n\n");
-		//printf("%s\n",questionList[n].content);
-		buff.answer[i + 8] = questionList[n].answer;
-	}
-	//printf("%s",buff.content);
-	return buff;
-}
+
 void makeOneQues(Message message[])
 {
 	int easy[4];
 	int medium[4];
 	int hard[2];
-	int i, n,count = 0;
+	int i, n, count = 0;
 	Message *buff;
 	srand((int)time(0));
 	randomId(easy, 1);
 	randomId(medium, 2);
 	randomId(hard, 3);
 	for (i = 0; i < 4; i++)
-	{	
+	{
 		buff = (Message *)malloc(sizeof(Message));
 		n = easyList[easy[i]];
 		strcpy((*buff).content, questionList[n].content);
@@ -288,10 +242,10 @@ void makeOneQues(Message message[])
 		strcat((*buff).content, questionList[n].choiceD);
 		strcat((*buff).content, "\n\n");
 		(*buff).answer[0] = questionList[n].answer;
-		strcpy(message[count].content,(*buff).content);
-		message[count].answer[0]=(*buff).answer[0];
-		// printf("%d : %s\n",count,message[count].content);
-		count ++;
+		strcpy(message[count].content, (*buff).content);
+		message[count].answer[0] = (*buff).answer[0];
+		printf("%d : %s\n", count, message[count].content);
+		count++;
 		free(buff);
 	}
 	for (i = 0; i < 4; i++)
@@ -309,10 +263,10 @@ void makeOneQues(Message message[])
 		strcat((*buff).content, questionList[n].choiceD);
 		strcat((*buff).content, "\n\n");
 		(*buff).answer[0] = questionList[n].answer;
-		strcpy(message[count].content,(*buff).content);
-		message[count].answer[0]=(*buff).answer[0];
-		// printf("%d : %s\n",count,message[count].content);
-		count ++;
+		strcpy(message[count].content, (*buff).content);
+		message[count].answer[0] = (*buff).answer[0];
+		printf("%d : %s\n", count, message[count].content);
+		count++;
 		free(buff);
 	}
 	for (i = 0; i < 2; i++)
@@ -330,10 +284,10 @@ void makeOneQues(Message message[])
 		strcat((*buff).content, questionList[n].choiceD);
 		strcat((*buff).content, "\n\n");
 		(*buff).answer[0] = questionList[n].answer;
-		strcpy(message[count].content,(*buff).content);
-		message[count].answer[0]=(*buff).answer[0];
-		// printf("%d : %s\n",count,message[count].content);
-		count ++;
+		strcpy(message[count].content, (*buff).content);
+		message[count].answer[0] = (*buff).answer[0];
+		printf("%d : %s\n", count, message[count].content);
+		count++;
 		free(buff);
 	}
 	//printf("%s",buff.content);
@@ -347,7 +301,8 @@ int checkAnswer(char *req, char *local)
 	// 	if (req[i] == local[i])
 	// 		point++;
 	// }
-	if (req[0] == local[0]) point++;
+	if (req[0] == local[0])
+		point++;
 	return point;
 }
 int main(int argc, char const *argv[])
@@ -364,13 +319,13 @@ int main(int argc, char const *argv[])
 
 	int listen_sock, conn_sock, n;
 	char username[MAX], password[MAX], answer[11], point[3], *reply;
+	char status[10];
 	int bytes_sent, bytes_received;
 	struct sockaddr_in server;
 	struct sockaddr_in client;
 	socklen_t sin_size;
 	node_t *found;
 	int pid;
-
 
 	// load file txt to linked list
 	node_t *account_list = load_data(filename);
@@ -423,40 +378,153 @@ int main(int argc, char const *argv[])
 		// on child process
 		if (pid == 0)
 		{
-			int count = 0; // count password repeatation
-			while (1)
+			if (0 >= (bytes_received = recv(conn_sock, status, MAX - 1, 0)))
 			{
-
-				if (0 >= (bytes_received = recv(conn_sock, username, MAX - 1, 0)))
-				{
-					printf("\nConnection closed 1\n");
-					break;
-				}
-				username[bytes_received] = '\0';
-
-				// check username existence
-				if ((found = find_node(account_list, username)))
-				{
-					if (found->status == 1)
-						reply = "1"; // username found
-					else
-						reply = "2"; // username found but has been locked
-				}
-				else
-					reply = "0"; // username not found
-
-				// echo to client
-				if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
-				{
-					printf("\nConnection closed 2\n");
-					break;
-				}
-
-				
-
+				printf("\nConnection closed 1\n");
+				break;
+			}
+			status[bytes_received] = '\0';
+			
+			if (strcmp(status, "1") == 0)
+			{
+				int count = 0; // count password repeatation
 				while (1)
 				{
-					// receive password
+
+					if (0 >= (bytes_received = recv(conn_sock, username, MAX - 1, 0)))
+					{
+						printf("\nConnection closed 1\n");
+						break;
+					}
+					username[bytes_received] = '\0';
+
+					// check username existence
+					if ((found = find_node(account_list, username)))
+					{
+						if (found->status == 1)
+							reply = "1"; // username found
+						else
+							reply = "2"; // username found but has been locked
+					}
+					else
+						reply = "0"; // username not found
+
+					// echo to client
+					if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
+					{
+						printf("\nConnection closed 2\n");
+						break;
+					}
+
+					while (1)
+					{
+						// receive password
+						memset(password, '\0', MAX);
+						if (0 >= (bytes_received = recv(conn_sock, password, MAX - 1, 0)))
+						{
+							printf("\nConnection closed 3\n");
+							break;
+						}
+						password[bytes_received] = '\0';
+
+						// validate password
+						if (0 == strcmp(found->password, password))
+						{
+							int point1 = 0;
+							Message buff[20];
+							makeOneQues(buff);
+							for (int i = 0; i < 10; i++)
+							{
+								// Message buff = makeQuesList();
+
+								reply = buff[i].content;
+								// printf("%d Đáp án:\n%s\n",i, buff[i].content);
+								if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
+								{
+									printf("\nConnection closed 4\n");
+									break;
+								}
+								if (0 >= (bytes_received = recv(conn_sock, answer, 11, 0)))
+								{
+									printf("\nConnection closed 5\n");
+									break;
+								}
+								printf("%s", answer);
+								n = checkAnswer(answer, buff[i].answer);
+								// printf("n= %d",n);
+								if (n == 1)
+									point1++;
+							}
+							printf("\n%d\n", point1);
+							if (found->point < point1)
+								found->point = point1;
+							save_list(account_list, filename);
+							snprintf(point, 3, "%d", point1);
+							if (0 >= (bytes_sent = send(conn_sock, point, strlen(point), 0)))
+							{
+								printf("\nConnection closed 6\n");
+								break;
+							}
+							printf("done");
+							if (found->point < point1)
+								found->point = point1;
+							save_list(account_list, filename);
+							snprintf(point, 3, "%d", point1);
+							if (0 >= (bytes_sent = send(conn_sock, point, strlen(point), 0)))
+							{
+								printf("\nConnection closed 6\n");
+								break;
+							}
+						}
+						else
+						{
+							count++;
+							if (count == 3)
+							{
+								reply = "2";	   // wrong pass 3 times, reply 2
+								found->status = 0; // then lock account
+							}
+							else
+								reply = "0"; // wrong pass < 3 times, reply 0
+							if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
+							{
+								printf("\nConnection closed 7\n");
+								break;
+							}
+							break;
+						}
+
+						// echo to client
+					}
+				}
+			}
+			else if (strcmp(status, "2") == 0)
+			{
+				if (0 >= (bytes_received = recv(conn_sock, username, MAX - 1, 0)))
+					{
+						printf("\nConnection closed 1\n");
+						break;
+					}
+					username[bytes_received] = '\0';
+
+					// check username existence
+					if ((found = find_node(account_list, username)))
+					{
+						if (found->status == 1)
+							reply = "1"; // username found
+						else
+							reply = "2"; // username found but has been locked
+					}
+					else
+						reply = "0"; // username not found
+
+					// echo to client
+					if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
+					{
+						printf("\nConnection closed 2\n");
+						break;
+					}
+					//get password
 					memset(password, '\0', MAX);
 					if (0 >= (bytes_received = recv(conn_sock, password, MAX - 1, 0)))
 					{
@@ -464,85 +532,16 @@ int main(int argc, char const *argv[])
 						break;
 					}
 					password[bytes_received] = '\0';
-
-					// validate password
-					if (0 == strcmp(found->password, password))
+					account_list = add_note(account_list,username,password);
+					save_list(account_list,filename);
+					reply = "4";
+					if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
 					{
-						int point1 = 0;
-						for(int i=0;i<10;i++)
-						{
-						// Message buff = makeQuesList();
-							Message buff[20]; 
-							makeOneQues(buff);
-							reply = buff[i].content;
-							// printf("%d Đáp án:\n%s\n",i, buff[i].content);
-							if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
-							{
-								printf("\nConnection closed 4\n");
-								break;
-							}
-							if (0 >= (bytes_received = recv(conn_sock, answer, 11, 0)))
-							{
-								printf("\nConnection closed 5\n");
-								break;
-							}
-							printf("%s",answer);
-							n = checkAnswer(answer, buff[i].answer);
-							// printf("n= %d",n);
-							if(n==1) point1 ++;
-							
-						}
-						printf("\n%d\n",point1);
-						if (found->point < point1)
-							found->point = point1;
-						save_list(account_list, filename);
-						snprintf(point, 3, "%d", point1);
-						if (0 >= (bytes_sent = send(conn_sock, point, strlen(point), 0)))
-						{
-							printf("\nConnection closed 6\n");
-							break;
-						}
-						printf("done");
-						if (found->point < point1)
-							found->point = point1;
-						save_list(account_list, filename);
-						snprintf(point, 3, "%d", point1);
-						if (0 >= (bytes_sent = send(conn_sock, point, strlen(point), 0)))
-						{
-							printf("\nConnection closed 6\n");
-							break;
-						}
-					}
-					else
-					{
-						count++;
-						if (count == 3)
-						{
-							reply = "2";	   // wrong pass 3 times, reply 2
-							found->status = 0; // then lock account
-							
-						}
-						else
-							reply = "0"; // wrong pass < 3 times, reply 0
-						if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
-						{
-							printf("\nConnection closed 7\n");
-							break;
-						}
+						printf("\nConnection closed 2\n");
 						break;
 					}
-
-					// echo to client
-				}
 			}
-			// save linked list state
-			save_list(account_list, filename);
-			close(conn_sock);
-		}
-		else
-		{
-			// on parent process
-			close(conn_sock);
+			
 		}
 	}
 	close(listen_sock);
