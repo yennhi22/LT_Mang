@@ -94,7 +94,7 @@ int main(int argc, char const *argv[])
 			printf("\nConnection closed!\n");
 			return 0;
 		}
-
+		
 		// receive server reply
 		memset(buff, '\0', MAX);
 		if (0 >= (bytes_received = recv(client_sock, buff, 8192, 0)))
@@ -102,6 +102,8 @@ int main(int argc, char const *argv[])
 			printf("\nError!Cannot receive data from sever!\n");
 			return 0;
 		}
+		
+		// printf("\nhello %d\n",bytes_received);
 		buff[bytes_received] = '\0';
 
 		// analyze server reply
@@ -117,23 +119,33 @@ int main(int argc, char const *argv[])
 		}
 		else
 		{ // if pass is right
-			printf("%s\n câu trả lời là:\t", buff);
-			scanf("%[^\n]%*c", answer);
-			Up(answer);
-			if (0 >= (bytes_sent = send(client_sock, answer, strlen(answer), 0)))
+			for(int i=0;i<10;i++)
 			{
-				printf("\nConnection closed!\n");
-				return 0;
+				printf("%s\n câu trả lời là:\t", buff);
+				scanf("%[^\n]%*c", answer);
+				Up(answer);
+				if (0 >= (bytes_sent = send(client_sock, answer, strlen(answer), 0)))
+				{
+					printf("\nConnection closed!\n");
+					return 0;
+				}
+				memset(buff, 0, 8192);
+				if (0 >= (bytes_received = recv(client_sock, buff, 8192, 0)))
+				{
+					printf("\nError!Cannot receive data from sever!\n");
+					return 0;
+				}
 			}
-			memset(buff, 0, 8192);
+			memset(buff, '\0', 8192);
 			if (0 >= (bytes_received = recv(client_sock, buff, 8192, 0)))
 			{
 				printf("\nError!Cannot receive data from sever!\n");
 				return 0;
 			}
-
 			printf("\nBạn trả lời đúng: %s/10", buff);
 			break;
+			
+			// break;
 		}
 	}
 	// Close socket

@@ -8,36 +8,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <time.h>
-#define BACKLOG 5
-#define MAX 8192
-#define QUES_FILENAME "question.txt"
-#define QUES_IN_LEVER 10
-#define QUES_NUMBER 30
-// account node
-typedef struct node
-{
-	char username[MAX];
-	char password[MAX];
-	int status;
-	int point;
-	struct node *next;
-} node_t;
-typedef struct question
-{
-	int id;
-	int level; //1 : easy, 2 : medium, 3 : hard
-	char content[200];
-	char choiceA[50];
-	char choiceB[50];
-	char choiceC[50];
-	char choiceD[50];
-	char answer;
-} Question;
-typedef struct message
-{
-	char content[8192];
-	char answer[11];
-} Message;
+#include "struct.h"
 Question questionList[QUES_NUMBER];
 int easyList[QUES_IN_LEVER];
 int mediumList[QUES_IN_LEVER];
@@ -203,6 +174,32 @@ void randomId(int *arr, int lv)
 		return;
 	}
 }
+int makeQuestion(int arr[])
+{
+	int easy[4];
+	int medium[4];
+	int hard[2];
+	int i, n=0;
+	srand((int)time(0));
+	randomId(easy, 1);
+	randomId(medium, 2);
+	randomId(hard, 3);
+	for (i = 0; i < 4; i++)
+	{
+		arr[n]=easy[i];
+		n++;
+	}
+	for (i = 0; i < 4; i++)
+	{
+		arr[n]=medium[i];
+		n++;
+	}
+	for (i = 0; i < 2; i++)
+	{
+		arr[n]=hard[i];
+		n++;
+	}
+}
 Message makeQuesList()
 {
 	int easy[4];
@@ -265,14 +262,92 @@ Message makeQuesList()
 	//printf("%s",buff.content);
 	return buff;
 }
+void makeOneQues(Message message[])
+{
+	int easy[4];
+	int medium[4];
+	int hard[2];
+	int i, n,count = 0;
+	Message *buff;
+	srand((int)time(0));
+	randomId(easy, 1);
+	randomId(medium, 2);
+	randomId(hard, 3);
+	for (i = 0; i < 4; i++)
+	{	
+		buff = (Message *)malloc(sizeof(Message));
+		n = easyList[easy[i]];
+		strcpy((*buff).content, questionList[n].content);
+		strcat((*buff).content, "\n");
+		strcat((*buff).content, questionList[n].choiceA);
+		strcat((*buff).content, "\t");
+		strcat((*buff).content, questionList[n].choiceB);
+		strcat((*buff).content, "\n");
+		strcat((*buff).content, questionList[n].choiceC);
+		strcat((*buff).content, "\t");
+		strcat((*buff).content, questionList[n].choiceD);
+		strcat((*buff).content, "\n\n");
+		(*buff).answer[0] = questionList[n].answer;
+		strcpy(message[count].content,(*buff).content);
+		message[count].answer[0]=(*buff).answer[0];
+		// printf("%d : %s\n",count,message[count].content);
+		count ++;
+		free(buff);
+	}
+	for (i = 0; i < 4; i++)
+	{
+		buff = (Message *)malloc(sizeof(Message));
+		n = mediumList[medium[i]];
+		strcpy((*buff).content, questionList[n].content);
+		strcat((*buff).content, "\n");
+		strcat((*buff).content, questionList[n].choiceA);
+		strcat((*buff).content, "\t");
+		strcat((*buff).content, questionList[n].choiceB);
+		strcat((*buff).content, "\n");
+		strcat((*buff).content, questionList[n].choiceC);
+		strcat((*buff).content, "\t");
+		strcat((*buff).content, questionList[n].choiceD);
+		strcat((*buff).content, "\n\n");
+		(*buff).answer[0] = questionList[n].answer;
+		strcpy(message[count].content,(*buff).content);
+		message[count].answer[0]=(*buff).answer[0];
+		// printf("%d : %s\n",count,message[count].content);
+		count ++;
+		free(buff);
+	}
+	for (i = 0; i < 2; i++)
+	{
+		buff = (Message *)malloc(sizeof(Message));
+		n = hardList[hard[i]];
+		strcpy((*buff).content, questionList[n].content);
+		strcat((*buff).content, "\n");
+		strcat((*buff).content, questionList[n].choiceA);
+		strcat((*buff).content, "\t");
+		strcat((*buff).content, questionList[n].choiceB);
+		strcat((*buff).content, "\n");
+		strcat((*buff).content, questionList[n].choiceC);
+		strcat((*buff).content, "\t");
+		strcat((*buff).content, questionList[n].choiceD);
+		strcat((*buff).content, "\n\n");
+		(*buff).answer[0] = questionList[n].answer;
+		strcpy(message[count].content,(*buff).content);
+		message[count].answer[0]=(*buff).answer[0];
+		// printf("%d : %s\n",count,message[count].content);
+		count ++;
+		free(buff);
+	}
+	//printf("%s",buff.content);
+	// return buff;
+}
 int checkAnswer(char *req, char *local)
 {
 	int point = 0;
-	for (int i = 0; i < 10; i++)
-	{
-		if (req[i] == local[i])
-			point++;
-	}
+	// for (int i = 0; i < 10; i++)
+	// {
+	// 	if (req[i] == local[i])
+	// 		point++;
+	// }
+	if (req[0] == local[0]) point++;
 	return point;
 }
 int main(int argc, char const *argv[])
@@ -295,6 +370,7 @@ int main(int argc, char const *argv[])
 	socklen_t sin_size;
 	node_t *found;
 	int pid;
+
 
 	// load file txt to linked list
 	node_t *account_list = load_data(filename);
@@ -350,6 +426,7 @@ int main(int argc, char const *argv[])
 			int count = 0; // count password repeatation
 			while (1)
 			{
+
 				if (0 >= (bytes_received = recv(conn_sock, username, MAX - 1, 0)))
 				{
 					printf("\nConnection closed 1\n");
@@ -391,24 +468,45 @@ int main(int argc, char const *argv[])
 					// validate password
 					if (0 == strcmp(found->password, password))
 					{
-						Message buff = makeQuesList();
-						reply = buff.content;
-						//printf("Đáp án:\n%s\n", buff.answer);
-						if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
+						int point1 = 0;
+						for(int i=0;i<10;i++)
 						{
-							printf("\nConnection closed 4\n");
-							break;
+						// Message buff = makeQuesList();
+							Message buff[20]; 
+							makeOneQues(buff);
+							reply = buff[i].content;
+							// printf("%d Đáp án:\n%s\n",i, buff[i].content);
+							if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
+							{
+								printf("\nConnection closed 4\n");
+								break;
+							}
+							if (0 >= (bytes_received = recv(conn_sock, answer, 11, 0)))
+							{
+								printf("\nConnection closed 5\n");
+								break;
+							}
+							printf("%s",answer);
+							n = checkAnswer(answer, buff[i].answer);
+							// printf("n= %d",n);
+							if(n==1) point1 ++;
+							
 						}
-						if (0 >= (bytes_received = recv(conn_sock, answer, 11, 0)))
-						{
-							printf("\nConnection closed 5\n");
-							break;
-						}
-						n = checkAnswer(answer, buff.answer);
-						if (found->point < n)
-							found->point = n;
+						printf("\n%d\n",point1);
+						if (found->point < point1)
+							found->point = point1;
 						save_list(account_list, filename);
-						snprintf(point, 3, "%d", n);
+						snprintf(point, 3, "%d", point1);
+						if (0 >= (bytes_sent = send(conn_sock, point, strlen(point), 0)))
+						{
+							printf("\nConnection closed 6\n");
+							break;
+						}
+						printf("done");
+						if (found->point < point1)
+							found->point = point1;
+						save_list(account_list, filename);
+						snprintf(point, 3, "%d", point1);
 						if (0 >= (bytes_sent = send(conn_sock, point, strlen(point), 0)))
 						{
 							printf("\nConnection closed 6\n");
